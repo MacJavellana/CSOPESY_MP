@@ -68,7 +68,7 @@ void ConsoleManager::switchConsole(std::string processName) {
     }
     else if (this->_consoleMap[processName]->canRemove()) {
         this->_consoleMap.erase(processName);
-        std::cout << "Process " + processName + " not found." << std::endl;
+        std::cout << "Process " + processName + " not found/currently doing something." << std::endl;
         return;
     }
 

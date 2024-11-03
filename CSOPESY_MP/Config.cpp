@@ -36,7 +36,7 @@ void Config::initialize() {
     int num_cpu = stoi(config["num-cpu"]);
     string scheduler = config["scheduler"].substr(1, config["scheduler"].size() - 2); // Remove quotes
     int quantum_cycles = stoi(config["quantum-cycles"]);
-    bool preemptive = stoi(config["preemptive"]) == 1;
+    bool preemptive = 1;
     float batch_process_freq = stof(config["batch-process-freq"]);
     int min_ins = stoi(config["min-ins"]);
     int max_ins = stoi(config["max-ins"]);
