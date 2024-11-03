@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <windows.h>
 
@@ -38,10 +39,10 @@ Process::Process(String name, std::uniform_int_distribution<int> commandDistr) :
     //}
     this->_pid = Process::nextID;
     Process::nextID++;
-    //std::random_device rand_dev;
-    //std::mt19937 generator(rand_dev());
-    //int numCommands = commandDistr(generator);
-    for (int i = 0; i < 100; i++) {
+    std::random_device rand_dev;
+    std::mt19937 generator(rand_dev());
+    int numCommands = commandDistr(generator);
+    for (int i = 0; i < numCommands; i++) {
         this->_commandList.push_back(
             std::make_shared<PrintCommand>(
                 "Hello world from " + this->_name + "!", this->_pid

@@ -6,10 +6,10 @@
 #include <string>
 #include <thread>
 
-#define MS_DELAY 50
-
 
 typedef std::string String;
+
+int PrintCommand::msDelay = 50;
 
 void PrintCommand::execute(int core, String filename) {
     std::ofstream output;
@@ -32,5 +32,10 @@ void PrintCommand::execute(int core, String filename) {
     else {
         std::cerr << filename << " failed to open" << std::endl;
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(MS_DELAY));
+    std::this_thread::sleep_for(std::chrono::milliseconds(PrintCommand::msDelay));
+}
+
+void PrintCommand::setMsDelay(int delay) {
+    if (delay < 0) return;
+    PrintCommand::msDelay = delay;
 }

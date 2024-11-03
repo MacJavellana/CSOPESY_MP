@@ -3,6 +3,7 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 #include <string>
+#include <memory>
 #include <queue>
 #include <vector>
 

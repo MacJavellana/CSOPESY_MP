@@ -13,10 +13,15 @@ public:
 
     void execute(int core, std::string output);
 
+    static void setMsDelay(int delay);
+
     int _pid;
     CommandType _type = PRINT;
 
     std::string _message;
+
+private:
+    static int msDelay;
 };
 
 #endif // !PRINTCOMMAND_H

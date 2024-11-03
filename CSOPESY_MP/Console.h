@@ -2,6 +2,7 @@
 #ifndef Console_H
 #define Console_H
 
+#include <memory>
 #include <string>
 #include <tuple>
 

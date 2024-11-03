@@ -3,6 +3,7 @@
 #define PROCESS_H
 
 #include <ctime>
+#include <memory>
 #include <string>
 #include <vector>
 

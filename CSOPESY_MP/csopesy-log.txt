@@ -1,0 +1,46 @@
+CPU Utilization: 0%
+Cores used: 0
+Cores available: 32
+
+--------------------------------------
+Running processes:
+Idle	Core: 0
+Idle	Core: 1
+Idle	Core: 2
+Idle	Core: 3
+Idle	Core: 4
+Idle	Core: 5
+Idle	Core: 6
+Idle	Core: 7
+Idle	Core: 8
+Idle	Core: 9
+Idle	Core: 10
+Idle	Core: 11
+Idle	Core: 12
+Idle	Core: 13
+Idle	Core: 14
+Idle	Core: 15
+Idle	Core: 16
+Idle	Core: 17
+Idle	Core: 18
+Idle	Core: 19
+Idle	Core: 20
+Idle	Core: 21
+Idle	Core: 22
+Idle	Core: 23
+Idle	Core: 24
+Idle	Core: 25
+Idle	Core: 26
+Idle	Core: 27
+Idle	Core: 28
+Idle	Core: 29
+Idle	Core: 30
+Idle	Core: 31
+
+Finished processes:
+process_0	(11/04/24 12:48:05 AM)	Finished	160 / 160
+process_1	(11/04/24 12:48:07 AM)	Finished	191 / 191
+process_2	(11/04/24 12:48:10 AM)	Finished	179 / 179
+process_3	(11/04/24 12:48:12 AM)	Finished	155 / 155
+process_4	(11/04/24 12:48:14 AM)	Finished	108 / 108
+--------------------------------------

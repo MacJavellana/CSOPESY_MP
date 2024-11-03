@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <thread>
 #include <tuple>

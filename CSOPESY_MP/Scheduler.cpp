@@ -1,9 +1,10 @@
 #include "Scheduler.h"
-#include "InitScheduler.h"
+#include "Config.h"
 
 #include <ctime>
 #include <chrono>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <thread>
 #include <limits.h>
@@ -63,7 +64,7 @@ void Scheduler::destroy() {
 }
 
 void Scheduler::addProcess(std::shared_ptr<Process> process) {
-    if (InitScheduler::_scheduler == "sjf") {
+    if (Config::_scheduler == "sjf") {
         this->_readyQueueSJF.push(process);
     }
     else {
@@ -169,13 +170,13 @@ void Scheduler::runFCFS(float delay) { // FCFS
                     this->running = true;
                 }
             }
-            else {
-                if (this->running == false) {
-                    std::chrono::duration<float> duration(delay);
-                    std::this_thread::sleep_for(duration);
-                    this->running = true;
-                }
-            }
+            //else {
+            //    if (this->running == false) {
+            //        std::chrono::duration<float> duration(delay);
+            //        std::this_thread::sleep_for(duration);
+            //        this->running = true;
+            //    }
+            //}
         }
     }
 }
@@ -202,11 +203,11 @@ void Scheduler::runSJF(float delay, bool preemptive) { // SJF
                             this->_readyQueueSJF.pop();
                         }
                     }
-                    if (this->running == false) {
-                        std::chrono::duration<float> duration(delay);
-                        std::this_thread::sleep_for(duration);
-                        this->running = true;
-                    }
+                    //if (this->running == false) {
+                    //    std::chrono::duration<float> duration(delay);
+                    //    std::this_thread::sleep_for(duration);
+                    //    this->running = true;
+                    //}
                 }
             }
         }
@@ -222,13 +223,13 @@ void Scheduler::runSJF(float delay, bool preemptive) { // SJF
                         this->running = true;
                     }
                 }
-                else {
-                    if (this->running == false) {
-                        std::chrono::duration<float> duration(delay);
-                        std::this_thread::sleep_for(duration);
-                        this->running = true;
-                    }
-                }
+                //else {
+                //    if (this->running == false) {
+                //        std::chrono::duration<float> duration(delay);
+                //        std::this_thread::sleep_for(duration);
+                //        this->running = true;
+                //    }
+                //}
             }
         }
     }
@@ -266,12 +267,12 @@ void Scheduler::runRR(float delay, int quantumCycles) { // RR
             }
         }
 
-        // If no tasks were scheduled, sleep for delay
-        if (!this->running) {
-            std::chrono::duration<float> duration(delay);
-            std::this_thread::sleep_for(duration);
-            this->running = true; // Set running to true to continue scheduling
-        }
+        //// If no tasks were scheduled, sleep for delay
+        //if (!this->running) {
+        //    std::chrono::duration<float> duration(delay);
+        //    std::this_thread::sleep_for(duration);
+        //    this->running = true; // Set running to true to continue scheduling
+        //}
     }
 }
 

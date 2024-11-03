@@ -1,6 +1,7 @@
 #include "Console.h"
 #include "ConsoleManager.h"
 #include <iostream>
+#include <memory>
 #include <string>
 #include "MainConsole.h"
 #include "ProcessConsole.h"
@@ -38,11 +39,19 @@ bool ConsoleManager::newConsole(std::string name, Console_ console) {
                 console = std::make_shared<ProcessConsole>(copyList.at(i));
                 found = true;
                 break;
+                
             }
         }
         if (found)
             this->_consoleMap[name] = console;
-
+        else {
+            std::uniform_int_distribution<int> distr(this->_scheduler->minIns, this->_scheduler->maxIns);
+            auto newProcess = std::make_shared<Process>(name, distr);
+            this->_scheduler->addProcess(newProcess);
+            console = std::make_shared<ProcessConsole>(newProcess);
+            this->_consoleMap[name] = console;
+            found = true;
+        }
         this->switchConsole(name);
     }
     else {

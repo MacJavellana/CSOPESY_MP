@@ -3,13 +3,15 @@
 #include "MainConsole.h"
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <fstream>
 #include "Scheduler.h"
 #include "MarqueeConsole.h"
-#include "InitScheduler.h"
+#include "Config.h"
+#include "PrintCommand.h"
 #include <random>
 
 #define SPACE " "
@@ -30,7 +32,7 @@ MainConsole::MainConsole(ConsoleManager* conman) : Console("MAIN_CONSOLE"), _con
 		if (arguments.at(0) == "-s") {
 			if (arguments.size() == 1)
 				std::cout << "No process specified." << std::endl;
-			else
+			else 
 				conman->newConsole(arguments.at(1));
 		}
 		else if (arguments.at(0) == "-r") {
@@ -75,7 +77,7 @@ void MainConsole::run() {
 			this->_initialized = true;
 			this->_conman->newConsole("MARQUEE_CONSOLE", std::make_shared<MarqueeConsole>(144));
 
-			InitScheduler schedConfig = InitScheduler();
+			Config schedConfig = Config();
 			schedConfig.initialize();
 			Scheduler::initialize(schedConfig.getNumCpu(), schedConfig.getBatchProcessFreq(), schedConfig.getMinIns(), schedConfig.getMaxIns());
 
@@ -83,7 +85,7 @@ void MainConsole::run() {
 
 			this->_conman->_scheduler = sched;
 
-			// Test add // TO REMOVE WHEN TEST IMPLEMENTED
+			PrintCommand::setMsDelay(schedConfig.getDelaysPerExec() * 1000);
 
 			std::string schedType = schedConfig.getScheduler();
 			if (schedType == "fcfs") {

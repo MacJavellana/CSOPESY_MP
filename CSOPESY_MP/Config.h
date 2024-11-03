@@ -1,16 +1,16 @@
-#ifndef INITSCHEDULER_H
-#define INITSCHEDULER_H
+#ifndef CONFIG_H
+#define CONFIG_H
 #include "Scheduler.h"
 
 #include <string>
 
 using namespace std;
 
-class InitScheduler
+class Config
 {
 public:
-    InitScheduler();
-    ~InitScheduler();
+    Config();
+    ~Config();
     void initialize();
 
     int getNumCpu() const {
@@ -62,4 +62,4 @@ private:
     friend class Scheduler;
 };
 
-#endif
+#endif // !CONFIG_H

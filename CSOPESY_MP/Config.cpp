@@ -1,21 +1,21 @@
-#include "InitScheduler.h"
+#include "Config.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 
-InitScheduler::InitScheduler() {
+Config::Config() {
 
 }
 
-InitScheduler::~InitScheduler() {
+Config::~Config() {
 
 }
 
-std::string InitScheduler::_scheduler = "";
+std::string Config::_scheduler = "";
 
-void InitScheduler::initialize() {
+void Config::initialize() {
     ifstream inputFile("config.txt");
     if (!inputFile.is_open()) {
         cerr << "Failed to open the file." << endl;

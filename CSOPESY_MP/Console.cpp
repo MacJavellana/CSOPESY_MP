@@ -1,6 +1,7 @@
 #include "Console.h"
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <thread>
 #include <windows.h>

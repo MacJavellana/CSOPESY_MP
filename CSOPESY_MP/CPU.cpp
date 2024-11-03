@@ -2,6 +2,7 @@
 
 #include "Process.h"
 
+#include <memory>
 #include <thread>
 
 

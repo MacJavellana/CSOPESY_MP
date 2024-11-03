@@ -5,6 +5,7 @@
 #include "Console.h"
 #include "Scheduler.h"
 #include <chrono>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include "MainConsole.h"
