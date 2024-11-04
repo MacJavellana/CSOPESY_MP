@@ -27,7 +27,6 @@ Edit the 'config.txt' file to adjust simulation parameters:
 - num-cpu: Number of CPU cores
 - scheduler: Scheduling algorithm ("fcfs" or "rr")
 - quantum-cycles: Time quantum for Round Robin (if applicable)
-- preemptive: Enable preemptive scheduling (0 or 1)
 - batch-process-freq: Frequency of automatic process creation
 - min-ins: Minimum number of instructions per process
 - max-ins: Maximum number of instructions per process
