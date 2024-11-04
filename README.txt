@@ -4,6 +4,7 @@ CSOPESY Machine Project - Process Scheduler Simulator
 Description:
 ------------
 This project simulates a process scheduler with multiple CPUs. It implements various scheduling algorithms and provides a command-line interface for interacting with the system.
+The main function is found in main.cpp.
 
 Features:
 ---------
