@@ -134,6 +134,7 @@
     <ClInclude Include="ICommand.h" />
     <ClInclude Include="MainConsole.h" />
     <ClInclude Include="MarqueeConsole.h" />
+    <ClInclude Include="MemoryAllocator.h" />
     <ClInclude Include="PrintCommand.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="ProcessConsole.h" />
