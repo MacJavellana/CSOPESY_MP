@@ -34,7 +34,7 @@ private:
 
     void runFCFS(float delay); // FCFS
     void runSJF(float delay, bool preemptive); // SJF
-    void runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllocator> allocator); // RR
+    void runRR(float delay, int quantumCycles); // RR
 
     void schedulerRun();
 

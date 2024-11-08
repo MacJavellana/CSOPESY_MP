@@ -49,6 +49,7 @@ void Scheduler::initialize(int cpuCount, float batchProcessFreq, int minIns, int
     _ptr->batchProcessFreq = batchProcessFreq;
     _ptr->minIns = minIns;
     _ptr->maxIns = maxIns;
+    _ptr->allocator = memoryAllocator;
 }
 
 void Scheduler::startFCFS(int delay) {
@@ -322,7 +323,7 @@ void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllo
     }
 }
 */
-void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllocator> allocator) {
+void Scheduler::runRR(float delay, int quantumCycles) {
     auto start = std::chrono::steady_clock::now();
     int quantumCycle = 0; // Initialize quantum cycle counter
 

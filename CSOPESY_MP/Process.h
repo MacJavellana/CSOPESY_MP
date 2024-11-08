@@ -43,15 +43,15 @@ public:
 
 private:
     int _pid;
+    size_t requiredMemorySize = 4096;
+    void* memoryAddress = nullptr;
+
     std::string _name;
     std::vector<std::shared_ptr<ICommand>> _commandList;
     int _commandCounter = 0;
     int _cpuCoreID = -1;
     time_t _arrivalTime = time(nullptr);
     time_t _finishTime = time(nullptr);
-
-    size_t requiredMemorySize = 4096;
-    void* memoryAddress = nullptr;
 };
 
 #endif // !PROCESS_H
