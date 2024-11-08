@@ -12,6 +12,7 @@
 #include "MarqueeConsole.h"
 #include "Config.h"
 #include "PrintCommand.h"
+#include "MemoryAllocator.h"
 #include <random>
 
 #define SPACE " "
@@ -79,7 +80,7 @@ void MainConsole::run() {
 
 			Config schedConfig = Config();
 			schedConfig.initialize();
-			Scheduler::initialize(schedConfig.getNumCpu(), schedConfig.getBatchProcessFreq(), schedConfig.getMinIns(), schedConfig.getMaxIns());
+			Scheduler::initialize(schedConfig.getNumCpu(), schedConfig.getBatchProcessFreq(), schedConfig.getMinIns(), schedConfig.getMaxIns(), std::make_shared<MemoryAllocator>(16384));
 
 			Scheduler* sched = Scheduler::get();
 

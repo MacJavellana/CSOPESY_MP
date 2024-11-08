@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "ICommand.h"
 #include <random>
@@ -35,6 +36,11 @@ public:
     };
     static int nextID;
 
+    size_t getRequiredMemorySize();
+    void* getMemoryAddress();
+    void setRequiredMemorySize(size_t size);
+    void setMemoryAddress(void* ptr);
+
 private:
     int _pid;
     std::string _name;
@@ -43,6 +49,9 @@ private:
     int _cpuCoreID = -1;
     time_t _arrivalTime = time(nullptr);
     time_t _finishTime = time(nullptr);
+
+    size_t requiredMemorySize = 4096;
+    void* memoryAddress = nullptr;
 };
 
 #endif // !PROCESS_H

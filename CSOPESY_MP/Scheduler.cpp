@@ -11,6 +11,7 @@
 
 #include "CPU.h"
 #include "Process.h"
+#include "MemoryAllocator.h"
 
 Scheduler::Scheduler() {
 
@@ -22,7 +23,7 @@ Scheduler* Scheduler::get() {
     return _ptr;
 }
 
-void Scheduler::initialize(int cpuCount, float batchProcessFreq, int minIns, int maxIns) {
+void Scheduler::initialize(int cpuCount, float batchProcessFreq, int minIns, int maxIns, std::shared_ptr<MemoryAllocator> memoryAllocator) {
     _ptr = new Scheduler();
     for (int i = 0; i < cpuCount; i++) {
         _ptr->_cpuList.push_back(std::make_shared<CPU>());
@@ -235,7 +236,8 @@ void Scheduler::runSJF(float delay, bool preemptive) { // SJF
     }
 }
 
-void Scheduler::runRR(float delay, int quantumCycles) { // RR
+/*
+void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllocator> allocator) { // RR
     auto start = std::chrono::steady_clock::now();
     while (this->running) {
         auto now = std::chrono::steady_clock::now();
@@ -273,6 +275,60 @@ void Scheduler::runRR(float delay, int quantumCycles) { // RR
         //    std::this_thread::sleep_for(duration);
         //    this->running = true; // Set running to true to continue scheduling
         //}
+    }
+}
+*/
+void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllocator> allocator) { // RR
+    auto start = std::chrono::steady_clock::now();
+
+    while (this->running) {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
+
+        // Check if quantum cycle limit exceeded
+        if (elapsed > quantumCycles) {
+            for (int i = 0; i < this->_cpuList.size(); i++) {
+                std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
+                if (cpu->getProcess() != nullptr) {
+                    std::shared_ptr<Process> process = cpu->getProcess();
+
+                    // Deallocate memory for the process if it’s being preempted
+                    allocator->deallocate(process->getMemoryAddress(), process->getRequiredMemorySize());
+                    process->setMemoryAddress(nullptr);  // Reset process memory pointer
+
+                    // Push current process back to ready queue
+                    this->_readyQueue.push(process);
+                    cpu->setProcess(nullptr);
+                    cpu->setReady();
+                    this->running = true; // Set running to true to continue scheduling
+                }
+            }
+            start = std::chrono::steady_clock::now(); // Reset start time for new cycle
+        }
+
+        // Assign processes to CPUs
+        for (int i = 0; i < this->_cpuList.size(); i++) {
+            std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
+            if (cpu->isReady() && !this->_readyQueue.empty()) {
+                std::shared_ptr<Process> currentProcess = this->_readyQueue.front();
+
+                // Attempt to allocate memory for the process
+                void* memory = allocator->allocate(currentProcess->getRequiredMemorySize());
+                if (memory != nullptr) {
+                    // Memory allocation succeeded
+                    currentProcess->setMemoryAddress(memory);
+
+                    this->_readyQueue.pop(); // Remove from ready queue
+                    cpu->setProcess(currentProcess); // Assign process to CPU
+                    this->running = true;
+                    start = std::chrono::steady_clock::now(); // Reset start time for the new process
+                }
+                else {
+                    // Insufficient memory; break the loop and try in the next cycle
+                    break;
+                }
+            }
+        }
     }
 }
 

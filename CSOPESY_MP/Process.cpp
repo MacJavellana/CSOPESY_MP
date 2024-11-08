@@ -69,4 +69,20 @@ void Process::setCPUCoreID(int cpuCoreID) {
     this->_cpuCoreID = cpuCoreID;
 }
 
+size_t Process::getRequiredMemorySize() {
+    return this->requiredMemorySize;
+}
+
+void* Process::getMemoryAddress() {
+    return this->memoryAddress;
+}
+
+void Process::setRequiredMemorySize(size_t size) {
+    requiredMemorySize = size;
+}
+
+void Process::setMemoryAddress(void* ptr) {
+    memoryAddress = ptr;
+}
+
 int Process::nextID = 0;
