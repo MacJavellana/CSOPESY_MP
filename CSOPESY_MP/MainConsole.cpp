@@ -86,7 +86,7 @@ void MainConsole::run() {
 
 			this->_conman->_scheduler = sched;
 
-			PrintCommand::setMsDelay(schedConfig.getDelaysPerExec() * 1000);
+			PrintCommand::setMsDelay(schedConfig.getDelaysPerExec() * 100);
 
 			std::string schedType = schedConfig.getScheduler();
 			if (schedType == "fcfs") {
