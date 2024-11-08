@@ -13,6 +13,24 @@
 #include "Process.h"
 #include "MemoryAllocator.h"
 
+#include <fstream>
+#include <filesystem>
+#include <iomanip>
+
+std::string generateTimestamp() {
+    auto now = chrono::system_clock::now();
+    std::time_t now_time = chrono::system_clock::to_time_t(now);
+    std::tm local_tm;
+#ifdef _WIN32
+    localtime_s(&local_tm, &now_time);
+#else
+    localtime_r(&now_time, &local_tm);
+#endif
+    char buffer[100];
+    std::strftime(buffer, sizeof(buffer), "%m/%d/%Y, %I:%M:%S %p", &local_tm);
+    return std::string(buffer);
+}
+
 Scheduler::Scheduler() {
 
 }
@@ -136,6 +154,32 @@ void Scheduler::printStatus() {
         std::cout << "-";
     }
     std::cout << std::endl;
+}
+
+void Scheduler::printMemory(int quantumCycle) const {
+    int allocationCount = allocator->getAllocationCount();
+    size_t fragmentedSpace = allocator->getFragmentedSpace();
+
+    std::ostringstream filenameStream;
+    filenameStream << "memory_stamp_" << std::setw(2) << std::setfill('0') << quantumCycle << ".txt";
+    std::string filename = filenameStream.str();
+
+    std::ofstream outFile(filename);
+
+    if (!outFile.is_open()) {
+        std::cerr << "Error opening file: " << filename << "\n";
+        return;
+    }
+
+    outFile << "Timestamp: " << generateTimestamp() << "\n";
+
+    outFile << "Number of processes in memory: " << allocationCount << "\n";
+
+    outFile << "Total fragmented space in KB: " << fragmentedSpace << "\n";
+
+    outFile << allocator->printMemory();
+
+    outFile.close();
 }
 
 void Scheduler::schedulerTest() {
@@ -278,8 +322,12 @@ void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllo
     }
 }
 */
-void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllocator> allocator) { // RR
+void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllocator> allocator) {
     auto start = std::chrono::steady_clock::now();
+    int quantumCycle = 0; // Initialize quantum cycle counter
+
+    // Log memory state immediately when the scheduler starts
+    printMemory(quantumCycle);
 
     while (this->running) {
         auto now = std::chrono::steady_clock::now();
@@ -287,26 +335,29 @@ void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllo
 
         // Check if quantum cycle limit exceeded
         if (elapsed > quantumCycles) {
+            quantumCycle++;  // Increment quantum cycle counter
+            printMemory(quantumCycle);  // Log memory state at the start of each quantum cycle
+
             for (int i = 0; i < this->_cpuList.size(); i++) {
                 std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
                 if (cpu->getProcess() != nullptr) {
                     std::shared_ptr<Process> process = cpu->getProcess();
 
-                    // Deallocate memory for the process if it’s being preempted
+                    // Deallocate memory if process is being preempted
                     allocator->deallocate(process->getMemoryAddress(), process->getRequiredMemorySize());
-                    process->setMemoryAddress(nullptr);  // Reset process memory pointer
+                    process->setMemoryAddress(nullptr);
 
-                    // Push current process back to ready queue
+                    // Push the current process back to the ready queue
                     this->_readyQueue.push(process);
                     cpu->setProcess(nullptr);
                     cpu->setReady();
-                    this->running = true; // Set running to true to continue scheduling
+                    this->running = true;
                 }
             }
-            start = std::chrono::steady_clock::now(); // Reset start time for new cycle
+            start = std::chrono::steady_clock::now(); // Reset start time for the new quantum cycle
         }
 
-        // Assign processes to CPUs
+        // Assign processes to CPUs if there are available processes
         for (int i = 0; i < this->_cpuList.size(); i++) {
             std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
             if (cpu->isReady() && !this->_readyQueue.empty()) {
@@ -315,16 +366,14 @@ void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllo
                 // Attempt to allocate memory for the process
                 void* memory = allocator->allocate(currentProcess->getRequiredMemorySize());
                 if (memory != nullptr) {
-                    // Memory allocation succeeded
                     currentProcess->setMemoryAddress(memory);
-
-                    this->_readyQueue.pop(); // Remove from ready queue
-                    cpu->setProcess(currentProcess); // Assign process to CPU
+                    this->_readyQueue.pop();
+                    cpu->setProcess(currentProcess);
                     this->running = true;
-                    start = std::chrono::steady_clock::now(); // Reset start time for the new process
+                    start = std::chrono::steady_clock::now(); // Reset start time for this process assignment
                 }
                 else {
-                    // Insufficient memory; break the loop and try in the next cycle
+                    // Break if there is insufficient memory and defer to the next cycle
                     break;
                 }
             }

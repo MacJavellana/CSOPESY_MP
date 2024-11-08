@@ -27,7 +27,7 @@ public:
     void schedulerTestStop();
 
     void printStatus();
-    void printMemory() const;
+    void printMemory(int quantumCycle) const;
 private:
     Scheduler();
     ~Scheduler() = default;
