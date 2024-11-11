@@ -6,6 +6,8 @@
 
 using namespace std;
 
+
+//TODO: Add the memory configs here too after the Group HW
 class Config
 {
 public:
