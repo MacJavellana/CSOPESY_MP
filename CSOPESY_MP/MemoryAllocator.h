@@ -53,6 +53,7 @@ public:
     std::string printMemory() override {
         std::ostringstream ss;
         ss << "----end---- = " << maxSize << "\n";
+        ss << "\n";
         size_t currentMemoryPosition = maxSize;
 
         for (size_t i = 0; i < memory.size(); ++i) {

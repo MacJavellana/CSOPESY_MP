@@ -176,7 +176,9 @@ void Scheduler::printMemory(int quantumCycle) const {
 
     outFile << "Number of processes in memory: " << allocationCount << "\n";
 
-    outFile << "Total fragmented space in KB: " << fragmentedSpace << "\n";
+    outFile << "Total external fragmentation in KB: " << fragmentedSpace << "\n";
+
+    outFile << "\n";
 
     outFile << allocator->printMemory();
 
@@ -328,7 +330,7 @@ void Scheduler::runRR(float delay, int quantumCycles) {
     int quantumCycle = 0; // Initialize quantum cycle counter
 
     // Log memory state immediately when the scheduler starts
-    printMemory(quantumCycle);
+    //printMemory(quantumCycle);
 
     while (this->running) {
         auto now = std::chrono::steady_clock::now();
