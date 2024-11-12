@@ -8,7 +8,7 @@
 
 class IMemory {
 public:
-	virtual void* allocate(size_t size) = 0;
+	virtual void* allocate(size_t size, int processID) = 0;
 	virtual void deallocate(void* ptr, size_t size) = 0;
 	virtual std::string printMemory() = 0;
 };
@@ -18,6 +18,7 @@ public:
     MemoryAllocator(size_t maxSize): maxSize(maxSize), usedMemorySize(0), memory(maxSize, '.') {
         for (size_t i = 0; i < maxSize; ++i) {
             memoryUsageMap[i] = false;
+            processMap[i] = -1;
         }
     }
 
@@ -33,10 +34,10 @@ public:
         return maxSize - usedMemorySize;
     }
 
-    void* allocate(size_t size) override { // Finds the first available block to send the process in
+    void* allocate(size_t size, int processID) override { // Finds the first available block to send the process in
         for (size_t i = 0; i < maxSize - size + 1; ++i) {
             if (!memoryUsageMap[i] && isMemoryAvailable(i, size)) {
-                allocateMemoryAt(i, size);
+                allocateMemoryAt(i, size, processID);
                 return &memory[i];
             }
         }
@@ -53,24 +54,18 @@ public:
     std::string printMemory() override {
         std::ostringstream ss;
         ss << "----end---- = " << maxSize << "\n";
-        ss << "\n";
-        size_t currentMemoryPosition = maxSize;
 
-        for (size_t i = 0; i < memory.size(); ++i) {
-            if (currentMemoryPosition == 0) {
-                break;
+        size_t currentMemoryPosition = maxSize;
+        int index = maxSize - 1;
+
+        while (index > 0) {
+            if (memoryUsageMap[index]) {
+                ss << index + 1 << "\n";
+                ss << "P" << processMap[index] << "\n";
+                index -= 4095; //this is fixed. assumes that these processes is 4096 bytes
+                ss << index << "\n\n";
             }
-            if (memoryUsageMap[i]) {
-                ss << currentMemoryPosition << "\n";
-                ss << "P" << i + 1 << "\n";
-                currentMemoryPosition -= 4096;
-                ss << currentMemoryPosition << "\n\n";
-            }
-            else {
-                ss << "\n";
-                currentMemoryPosition -= 16;
-                ss << currentMemoryPosition << "\n";
-            }
+            index--;
         }
         ss << "----start---- = 0\n";
         return ss.str();
@@ -81,6 +76,7 @@ private:
     size_t usedMemorySize;
     std::vector<char> memory;
     std::unordered_map<size_t, bool> memoryUsageMap;
+    std::unordered_map<size_t, bool> processMap;
     int allocationCount = 0;
 
     void clearMemoryUsage() {
@@ -88,6 +84,7 @@ private:
         memoryUsageMap.clear();                       // Clear existing entries
         for (size_t i = 0; i < maxSize; ++i) {
             memoryUsageMap[i] = false;
+            processMap[i] = -1;
         }
     }
 
@@ -101,9 +98,10 @@ private:
         return true;
     }
 
-    void allocateMemoryAt(size_t index, size_t size) {
+    void allocateMemoryAt(size_t index, size_t size, int processID) {
         for (size_t i = index; i < index + size; ++i) {
             memoryUsageMap[i] = true;
+            processMap[i] = processID;
         }
         usedMemorySize += size;
         allocationCount++;
@@ -112,6 +110,7 @@ private:
     void deallocateMemoryAt(size_t index, size_t size) {
         for (size_t i = index; i < index + size; ++i) {
             memoryUsageMap[i] = false;
+            processMap[i] = -1;
         }
         usedMemorySize -= size;
         allocationCount--;

@@ -16,6 +16,7 @@
 #include <fstream>
 #include <filesystem>
 #include <iomanip>
+#include <queue>
 
 std::string generateTimestamp() {
     auto now = chrono::system_clock::now();
@@ -327,62 +328,76 @@ void Scheduler::runRR(float delay, int quantumCycles, std::shared_ptr<MemoryAllo
 */
 void Scheduler::runRR(float delay, int quantumCycles) {
     auto start = std::chrono::steady_clock::now();
-    int quantumCycle = 0; // Initialize quantum cycle counter
-
-    // Log memory state immediately when the scheduler starts
-    //printMemory(quantumCycle);
+    int quantumCycle = 0;
+    int activeProcessCount = 0;  // Count of processes currently holding memory
+    queue<std::shared_ptr<Process>> waitingQueue;  // Queue for processes that need memory allocation
 
     while (this->running) {
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
 
-        // Check if quantum cycle limit exceeded
+        // End of quantum cycle: Preempt and deallocate memory if needed
         if (elapsed > quantumCycles) {
-            quantumCycle++;  // Increment quantum cycle counter
-            printMemory(quantumCycle);  // Log memory state at the start of each quantum cycle
+            quantumCycle++;
+            printMemory(quantumCycle);  // Log memory state each quantum cycle
 
-            for (int i = 0; i < this->_cpuList.size(); i++) {
-                std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
+            // Preempt processes and deallocate their memory at the end of the quantum
+            for (auto& cpu : _cpuList) {
                 if (cpu->getProcess() != nullptr) {
-                    std::shared_ptr<Process> process = cpu->getProcess();
+                    auto process = cpu->getProcess();
 
-                    // Deallocate memory if process is being preempted
+                    // Deallocate memory and reduce active process count
                     allocator->deallocate(process->getMemoryAddress(), process->getRequiredMemorySize());
                     process->setMemoryAddress(nullptr);
+                    activeProcessCount--;  // Reduce count of active processes
 
-                    // Push the current process back to the ready queue
-                    this->_readyQueue.push(process);
-                    cpu->setProcess(nullptr);
+                    // Move process back to the ready queue for rescheduling
+                    _readyQueue.push(process);
+                    cpu->setProcess(nullptr);  // Clear CPU assignment
                     cpu->setReady();
-                    this->running = true;
                 }
             }
-            start = std::chrono::steady_clock::now(); // Reset start time for the new quantum cycle
+            start = std::chrono::steady_clock::now();  // Reset quantum timer
         }
 
-        // Assign processes to CPUs if there are available processes
-        for (int i = 0; i < this->_cpuList.size(); i++) {
-            std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
-            if (cpu->isReady() && !this->_readyQueue.empty()) {
-                std::shared_ptr<Process> currentProcess = this->_readyQueue.front();
+        // Assign new processes to each CPU, but enforce strict limit based on CPU count
+        for (auto& cpu : _cpuList) {
+            if (cpu->isReady() && !_readyQueue.empty() && activeProcessCount < _cpuList.size()) {
+                auto currentProcess = _readyQueue.front();
 
-                // Attempt to allocate memory for the process
-                void* memory = allocator->allocate(currentProcess->getRequiredMemorySize());
-                if (memory != nullptr) {
-                    currentProcess->setMemoryAddress(memory);
-                    this->_readyQueue.pop();
-                    cpu->setProcess(currentProcess);
-                    this->running = true;
-                    start = std::chrono::steady_clock::now(); // Reset start time for this process assignment
+                // Attempt to allocate memory only if we are within the CPU limit
+                if (activeProcessCount < _cpuList.size()) {
+                    void* memory = allocator->allocate(currentProcess->getRequiredMemorySize(), currentProcess->getID());
+                    if (memory != nullptr) {
+                        // Successful memory allocation; assign process to the CPU
+                        currentProcess->setMemoryAddress(memory);
+                        _readyQueue.pop();
+                        cpu->setProcess(currentProcess);
+                        activeProcessCount++;  // Increment active process count
+                    }
+                    else {
+                        // Move to waiting queue if memory allocation fails
+                        waitingQueue.push(currentProcess);
+                        _readyQueue.pop();
+                    }
                 }
-                else {
-                    // Break if there is insufficient memory and defer to the next cycle
-                    break;
-                }
+            }
+        }
+        // Check waitingQueue to see if deallocated memory allows for allocation
+        while (!waitingQueue.empty() && activeProcessCount < _cpuList.size()) {
+            auto waitingProcess = waitingQueue.front();
+            void* memory = allocator->allocate(waitingProcess->getRequiredMemorySize(), waitingProcess->getID());
+            if (memory != nullptr) {
+                // Move process from waitingQueue to readyQueue if memory is now available
+                waitingProcess->setMemoryAddress(memory);
+                _readyQueue.push(waitingProcess);
+                waitingQueue.pop();
+                activeProcessCount++;  // Increment active process count for newly allocated process
+            }
+            else {
+                // Stop if no memory is available for remaining processes
+                break;
             }
         }
     }
 }
-
-
-
