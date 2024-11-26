@@ -2,10 +2,10 @@
 #ifndef MARQUEECONSOLE_H
 #define MARQUEECONSOLE_H
 
-#include "Console.h"
+#include "AConsole.h"
 #include <string>
 
-class MarqueeConsole : public Console {
+class MarqueeConsole : public AConsole {
 public:
 	MarqueeConsole(int refreshRate);
 	~MarqueeConsole() = default;

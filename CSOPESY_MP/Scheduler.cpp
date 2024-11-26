@@ -1,19 +1,34 @@
-#include "Scheduler.h"
 #include "Config.h"
+#include "Scheduler.h"
 
-#include <ctime>
 #include <chrono>
+#include <ctime>
 #include <iostream>
 #include <memory>
+#include <random>
 #include <string>
 #include <thread>
-#include <limits.h>
 
 #include "CPU.h"
+#include "MemoryManager.h"
 #include "Process.h"
 
-Scheduler::Scheduler() {
+Scheduler::Scheduler() {}
 
+int Scheduler::getTotalTicks() {
+    int total = 0;
+    for (size_t i = 0; i < this->_cpuList.size(); i++) {
+        total += _cpuList[i]->getTotalTicks();
+    }
+    return total;
+}
+
+int Scheduler::getInactiveTicks() {
+    int total = 0;
+    for (size_t i = 0; i < this->_cpuList.size(); i++) {
+        total += _cpuList[i]->getInactiveTicks();
+    }
+    return total;
 }
 
 Scheduler* Scheduler::_ptr = nullptr;
@@ -22,7 +37,11 @@ Scheduler* Scheduler::get() {
     return _ptr;
 }
 
-void Scheduler::initialize(int cpuCount, float batchProcessFreq, int minIns, int maxIns) {
+void Scheduler::initialize(int cpuCount,
+    float batchProcessFreq,
+    int minIns, int maxIns,
+    int minMemProc, int maxMemProc,
+    int maxMem, int minPage, int maxPage) {
     _ptr = new Scheduler();
     for (int i = 0; i < cpuCount; i++) {
         _ptr->_cpuList.push_back(std::make_shared<CPU>());
@@ -30,6 +49,11 @@ void Scheduler::initialize(int cpuCount, float batchProcessFreq, int minIns, int
     _ptr->batchProcessFreq = batchProcessFreq;
     _ptr->minIns = minIns;
     _ptr->maxIns = maxIns;
+    _ptr->_minMemProc = minMemProc;
+    _ptr->_maxMemProc = maxMemProc;
+    _ptr->_minPage = minPage;
+    _ptr->_maxPage = maxPage;
+    _ptr->_memMan = new MemoryManager(maxMem, minPage, maxPage);
 }
 
 void Scheduler::startFCFS(int delay) {
@@ -64,6 +88,7 @@ void Scheduler::destroy() {
 }
 
 void Scheduler::addProcess(std::shared_ptr<Process> process) {
+    std::lock_guard<std::mutex> lock(this->mtx);
     if (Config::_scheduler == "sjf") {
         this->_readyQueueSJF.push(process);
     }
@@ -74,6 +99,7 @@ void Scheduler::addProcess(std::shared_ptr<Process> process) {
 }
 
 void Scheduler::printStatus() {
+    std::lock_guard<std::mutex> lock(this->mtx);
     int cpuReadyCount = 0;
     for (std::shared_ptr<CPU> cpu : this->_cpuList) {
         if (cpu->isReady()) {
@@ -137,17 +163,23 @@ void Scheduler::printStatus() {
     std::cout << std::endl;
 }
 
+void Scheduler::printMem() {
+    this->_memMan->printMem(this->_cycleCount);
+}
+
 void Scheduler::schedulerTest() {
+    std::cout << "Started adding processes." << std::endl;
     this->_testRunning = true;
     std::thread t(&Scheduler::schedulerRun, this);
     t.detach();
 }
 
 void Scheduler::schedulerRun() {
-    std::cout << "Started adding processes." << std::endl;
+    std::uniform_int_distribution<int>  commandDistr(this->minIns, this->maxIns);
+    std::uniform_int_distribution<int>  memDistr(this->_minMemProc, this->_maxMemProc);
+    std::uniform_int_distribution<int>  pageDistr(this->_minPage, this->_maxPage);
     while (this->_testRunning) {
-        std::uniform_int_distribution<int>  distr(this->minIns, this->maxIns);
-        std::shared_ptr<Process> process = std::make_shared<Process>("process_" + std::to_string(Process::nextID), distr);
+        std::shared_ptr<Process> process = std::make_shared<Process>("process_" + std::to_string(Process::nextID), commandDistr, memDistr, pageDistr);
         this->addProcess(process);
         std::this_thread::sleep_for(std::chrono::milliseconds(int(this->batchProcessFreq * 1000)));
     }
@@ -164,10 +196,15 @@ void Scheduler::runFCFS(float delay) { // FCFS
         for (int i = 0; i < this->_cpuList.size(); i++) {
             std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
             if (cpu->isReady()) {
+                if (cpu->getProcess() != nullptr && cpu->getProcess()->hasFinished()) {
+                    _memMan->deallocate(cpu->getProcess());
+                }
                 if (this->_readyQueue.size() > 0) {
-                    cpu->setProcess(this->_readyQueue.front());
-                    this->_readyQueue.pop();
-                    this->running = true;
+                    if (_memMan->allocate(this->_readyQueue.front())) {
+                        cpu->setProcess(this->_readyQueue.front());
+                        this->_readyQueue.pop();
+                        this->running = true;
+                    }
                 }
             }
             //else {
@@ -182,34 +219,33 @@ void Scheduler::runFCFS(float delay) { // FCFS
 }
 
 void Scheduler::runSJF(float delay, bool preemptive) { // SJF
+    std::unique_lock<std::mutex> lock(this->mtx);
+    lock.unlock();
     if (preemptive) {
         while (this->running) {
+            lock.lock();
             for (int i = 0; i < this->_cpuList.size(); i++) {
                 std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
-                if (cpu->isReady()) {
-                    if (!this->_readyQueueSJF.empty()) {
-                        cpu->setProcess(this->_readyQueueSJF.top());
-                        this->_readyQueueSJF.pop();
-                        this->running = true;
-                    }
+                std::shared_ptr<Process> oldProcess = cpu->getProcess();
+                if (oldProcess != nullptr && oldProcess->hasFinished()) {
+                    _memMan->deallocate(oldProcess);
                 }
-                else {
-                    if (this->running == true && !this->_readyQueueSJF.empty()) {
-                        if (cpu->getProcess()->getBurst() > this->_readyQueueSJF.top()->getBurst()) {
-                            std::chrono::duration<float> duration(delay);
-                            std::this_thread::sleep_for(duration);
-                            this->_readyQueueSJF.push(cpu->getProcess());
-                            cpu->setProcess(this->_readyQueueSJF.top());
-                            this->_readyQueueSJF.pop();
-                        }
+                cpu->setProcess(nullptr);
+
+                if (oldProcess != nullptr && !oldProcess->hasFinished()) this->_readyQueueSJF.push(oldProcess);
+
+                if (!this->_readyQueueSJF.empty()) {
+                    std::shared_ptr<Process> newProcess = this->_readyQueueSJF.top();
+                    this->_readyQueueSJF.pop();
+                    if (_memMan->allocate(newProcess)) {
+                        cpu->setProcess(newProcess);
                     }
-                    //if (this->running == false) {
-                    //    std::chrono::duration<float> duration(delay);
-                    //    std::this_thread::sleep_for(duration);
-                    //    this->running = true;
-                    //}
+                    else {
+                        this->_readyQueueSJF.push(newProcess);
+                    }
                 }
             }
+            lock.unlock();
         }
     }
     else {
@@ -217,10 +253,16 @@ void Scheduler::runSJF(float delay, bool preemptive) { // SJF
             for (int i = 0; i < this->_cpuList.size(); i++) {
                 std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
                 if (cpu->isReady()) {
+                    if (cpu->getProcess() != nullptr && cpu->getProcess()->hasFinished()) {
+                        _memMan->deallocate(cpu->getProcess());
+                        cpu->setProcess(nullptr);
+                    }
                     if (this->_readyQueueSJF.size() > 0) {
-                        cpu->setProcess(this->_readyQueueSJF.top());
-                        this->_readyQueueSJF.pop();
-                        this->running = true;
+                        if (_memMan->allocate(this->_readyQueueSJF.top())) {
+                            cpu->setProcess(this->_readyQueueSJF.top());
+                            this->_readyQueueSJF.pop();
+                            this->running = true;
+                        }
                     }
                 }
                 //else {
@@ -237,16 +279,19 @@ void Scheduler::runSJF(float delay, bool preemptive) { // SJF
 
 void Scheduler::runRR(float delay, int quantumCycles) { // RR
     auto start = std::chrono::steady_clock::now();
+    this->_cycleCount = 0;
     while (this->running) {
         auto now = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
 
         // Check if quantum cycle limit exceeded
+
         if (elapsed > quantumCycles) {
             for (int i = 0; i < this->_cpuList.size(); i++) {
                 std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
                 if (cpu->getProcess() != nullptr) {
                     // Push current process back to ready queue
+                    //_memMan->deallocate(cpu->getProcess()); // TO UNCOMMENT
                     this->_readyQueue.push(cpu->getProcess());
                     cpu->setProcess(nullptr);
                     cpu->setReady();
@@ -254,15 +299,30 @@ void Scheduler::runRR(float delay, int quantumCycles) { // RR
                 }
             }
             start = std::chrono::steady_clock::now(); // Reset start time for new cycle
+            this->_cycleCount++;
         }
 
         // Assign processes to CPUs
         for (int i = 0; i < this->_cpuList.size(); i++) {
             std::shared_ptr<CPU> cpu = this->_cpuList.at(i);
+            if (cpu->getProcess() != nullptr && cpu->getProcess()->hasFinished()) {
+                _memMan->deallocate(cpu->getProcess());
+                cpu->setProcess(nullptr);
+                cpu->setReady();
+            }
             if (cpu->isReady() && !this->_readyQueue.empty()) {
-                cpu->setProcess(this->_readyQueue.front());
-                this->_readyQueue.pop();
-                this->running = true;
+                std::shared_ptr<Process> process = this->_readyQueue.front();
+
+                if (_memMan->allocate(process)) {
+                    process->setCPUCoreID(cpu->getId());
+                    cpu->setProcess(process);
+                    this->_readyQueue.pop();
+                    this->running = true;
+                }
+                else {
+                    this->_readyQueue.pop();
+                    this->_readyQueue.push(process);
+                }
                 start = std::chrono::steady_clock::now(); // Reset start time for the new process
             }
         }
@@ -276,5 +336,34 @@ void Scheduler::runRR(float delay, int quantumCycles) { // RR
     }
 }
 
+void Scheduler::processSmi() {
+    for (int i = 0; i < 48; i++) {
+        std::cout << "-";
+    }
+    std::cout << std::endl;
+
+    std::cout << "| PROCESS-SMI V01.00 \t Driver Version: 01.00 |" << std::endl;
+
+    for (int i = 0; i < 48; i++) {
+        std::cout << "-";
+    }
+    std::cout << std::endl;
+
+    int cpuUse = 100 / this->_cpuList.size();
+    int cpuUsage = 0;
+    for (int i = 0; i < this->_cpuList.size(); i++) {
+        if (this->_cpuList[i]->getProcess() != nullptr) {
+            cpuUsage += cpuUse;
+        }
+    }
+
+    std::cout << "CPU-Util: " << cpuUsage << "%" << std::endl;
+
+    this->_memMan->getAllocator()->printProcesses();
+}
+
+void Scheduler::vmstat() {
+    this->_memMan->vmstat();
+}
 
 

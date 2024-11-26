@@ -127,26 +127,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AConsole.h" />
     <ClInclude Include="Config.h" />
-    <ClInclude Include="Console.h" />
     <ClInclude Include="ConsoleManager.h" />
     <ClInclude Include="CPU.h" />
+    <ClInclude Include="FlatAllocator.h" />
+    <ClInclude Include="IAllocator.h" />
     <ClInclude Include="ICommand.h" />
     <ClInclude Include="MainConsole.h" />
     <ClInclude Include="MarqueeConsole.h" />
+    <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="PagingAllocator.h" />
     <ClInclude Include="PrintCommand.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="ProcessConsole.h" />
     <ClInclude Include="Scheduler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AConsole.cpp" />
     <ClCompile Include="Config.cpp" />
-    <ClCompile Include="Console.cpp" />
     <ClCompile Include="ConsoleManager.cpp" />
     <ClCompile Include="CPU.cpp" />
+    <ClCompile Include="FlatAllocator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainConsole.cpp" />
     <ClCompile Include="MarqueeConsole.cpp" />
+    <ClCompile Include="MemoryManager.cpp" />
+    <ClCompile Include="PagingAllocator.cpp" />
     <ClCompile Include="PrintCommand.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="ProcessConsole.cpp" />

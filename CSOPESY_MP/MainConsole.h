@@ -2,7 +2,7 @@
 #ifndef MAINCONSOLE_H
 #define MAINCONSOLE_H
 
-#include "Console.h"
+#include "AConsole.h"
 #include "ConsoleManager.h"
 #include <functional>
 #include <memory>
@@ -13,7 +13,7 @@
 typedef const std::vector<std::string>& argType;
 
 
-class MainConsole : public Console {
+class MainConsole : public AConsole {
 public:
     MainConsole(ConsoleManager* conman);
     ~MainConsole() = default;

@@ -1,4 +1,4 @@
-#include "Console.h"
+#include "AConsole.h"
 #include "MarqueeConsole.h"
 #include <chrono>
 #include <conio.h>
@@ -10,7 +10,7 @@
 #include <tuple>
 
 
-MarqueeConsole::MarqueeConsole(int refreshRate) : Console("MarqueeConsole") {
+MarqueeConsole::MarqueeConsole(int refreshRate) : AConsole("MarqueeConsole") {
 	this->refreshRate = refreshRate;
 	this->interval = 1000.0 / refreshRate;
 }

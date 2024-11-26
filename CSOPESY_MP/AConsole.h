@@ -1,16 +1,16 @@
 #pragma once
-#ifndef Console_H
-#define Console_H
+#ifndef ACONSOLE_H
+#define ACONSOLE_H
 
 #include <memory>
 #include <string>
 #include <tuple>
 
 
-class Console {
+class AConsole {
 public:
-    Console(std::string name);
-    ~Console() = default;
+    AConsole(std::string name);
+    ~AConsole() = default;
 
     bool isActive() { return this->_active; }
     bool canRemove() { return this->_canRemove; };
@@ -34,5 +34,5 @@ protected:
     bool _canRemove = false;
 };
 
-#endif // !Console_H
+#endif // !ACONSOLE_H
 

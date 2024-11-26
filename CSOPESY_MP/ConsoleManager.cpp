@@ -1,4 +1,4 @@
-#include "Console.h"
+#include "AConsole.h"
 #include "ConsoleManager.h"
 #include <iostream>
 #include <memory>
@@ -25,7 +25,7 @@ void ConsoleManager::start() {
     this->_current->run();
 }
 
-bool ConsoleManager::newConsole(std::string name, Console_ console) {
+bool ConsoleManager::newConsole(std::string name, AConsole_ console) {
     if (this->_consoleMap.find(name) != this->_consoleMap.end()) {
         std::cout << "Process '" + name + "' is already running!" << std::endl;
         return false;
@@ -39,19 +39,11 @@ bool ConsoleManager::newConsole(std::string name, Console_ console) {
                 console = std::make_shared<ProcessConsole>(copyList.at(i));
                 found = true;
                 break;
-                
             }
         }
         if (found)
             this->_consoleMap[name] = console;
-        else {
-            std::uniform_int_distribution<int> distr(this->_scheduler->minIns, this->_scheduler->maxIns);
-            auto newProcess = std::make_shared<Process>(name, distr);
-            this->_scheduler->addProcess(newProcess);
-            console = std::make_shared<ProcessConsole>(newProcess);
-            this->_consoleMap[name] = console;
-            found = true;
-        }
+
         this->switchConsole(name);
     }
     else {
@@ -68,7 +60,7 @@ void ConsoleManager::switchConsole(std::string processName) {
     }
     else if (this->_consoleMap[processName]->canRemove()) {
         this->_consoleMap.erase(processName);
-        std::cout << "Process " + processName + " not found/currently doing something." << std::endl;
+        std::cout << "Process " + processName + " not found." << std::endl;
         return;
     }
 

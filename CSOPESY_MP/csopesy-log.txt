@@ -1,46 +1,25 @@
-CPU Utilization: 0%
-Cores used: 0
-Cores available: 32
+CPU Utilization: 100%
+Cores used: 16
+Cores available: 0
 
 --------------------------------------
 Running processes:
-Idle	Core: 0
-Idle	Core: 1
-Idle	Core: 2
-Idle	Core: 3
-Idle	Core: 4
-Idle	Core: 5
-Idle	Core: 6
-Idle	Core: 7
-Idle	Core: 8
-Idle	Core: 9
-Idle	Core: 10
-Idle	Core: 11
-Idle	Core: 12
-Idle	Core: 13
-Idle	Core: 14
-Idle	Core: 15
-Idle	Core: 16
-Idle	Core: 17
-Idle	Core: 18
-Idle	Core: 19
-Idle	Core: 20
-Idle	Core: 21
-Idle	Core: 22
-Idle	Core: 23
-Idle	Core: 24
-Idle	Core: 25
-Idle	Core: 26
-Idle	Core: 27
-Idle	Core: 28
-Idle	Core: 29
-Idle	Core: 30
-Idle	Core: 31
+process_32	(11/04/24 10:31:28 PM)	Core: 0	0 / 5000
+process_3	(11/04/24 10:30:57 PM)	Core: 1	5 / 5000
+process_9	(11/04/24 10:31:04 PM)	Core: 2	4 / 5000
+process_5	(11/04/24 10:31:00 PM)	Core: 3	5 / 5000
+process_15	(11/04/24 10:31:10 PM)	Core: 4	3 / 5000
+process_6	(11/04/24 10:31:01 PM)	Core: 5	5 / 5000
+process_21	(11/04/24 10:31:17 PM)	Core: 6	1 / 5000
+process_22	(11/04/24 10:31:18 PM)	Core: 7	1 / 5000
+process_23	(11/04/24 10:31:19 PM)	Core: 8	1 / 5000
+process_24	(11/04/24 10:31:20 PM)	Core: 9	2 / 5000
+process_25	(11/04/24 10:31:21 PM)	Core: 10	3 / 5000
+process_26	(11/04/24 10:31:22 PM)	Core: 11	1 / 5000
+process_16	(11/04/24 10:31:11 PM)	Core: 12	3 / 5000
+process_17	(11/04/24 10:31:13 PM)	Core: 13	3 / 5000
+process_18	(11/04/24 10:31:14 PM)	Core: 14	2 / 5000
+process_19	(11/04/24 10:31:15 PM)	Core: 15	3 / 5000
 
 Finished processes:
-process_0	(11/04/24 12:48:05 AM)	Finished	160 / 160
-process_1	(11/04/24 12:48:07 AM)	Finished	191 / 191
-process_2	(11/04/24 12:48:10 AM)	Finished	179 / 179
-process_3	(11/04/24 12:48:12 AM)	Finished	155 / 155
-process_4	(11/04/24 12:48:14 AM)	Finished	108 / 108
 --------------------------------------

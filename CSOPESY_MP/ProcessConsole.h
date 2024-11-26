@@ -2,11 +2,11 @@
 #ifndef PROCESSCONSOLE_H
 #define PROCESSCONSOLE_H
 
-#include "Console.h"
+#include "AConsole.h"
 #include "Process.h"
 
 
-class ProcessConsole : public Console {
+class ProcessConsole : public AConsole {
 public:
     ProcessConsole(std::shared_ptr<Process> process);
     ~ProcessConsole() = default;

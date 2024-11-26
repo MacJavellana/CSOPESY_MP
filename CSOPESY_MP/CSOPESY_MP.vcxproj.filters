@@ -13,78 +13,141 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Commands">
-      <UniqueIdentifier>{8a17eb51-932e-41b7-9eb8-85fb2b3af1bf}</UniqueIdentifier>
+    <Filter Include="Header Files\Config">
+      <UniqueIdentifier>{2b40b3d3-85b5-47a5-9223-1ef0c57e9510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Console">
+      <UniqueIdentifier>{73e84baa-eac2-4195-8839-2de453ef87a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Console\MainConsole">
+      <UniqueIdentifier>{9764aec3-dcf0-435a-ae0f-0ab7399872d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Console\Manager">
+      <UniqueIdentifier>{abbc351d-e205-4273-8799-a307e66de792}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Console\MarqueeConsole">
+      <UniqueIdentifier>{b48fff4b-5f8f-465f-b966-b55a2bc362a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Console\ProcessConsole">
+      <UniqueIdentifier>{49c2d15e-800e-4f2e-9c10-7b5ded86d54e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory">
+      <UniqueIdentifier>{8403a018-5751-4f57-a70b-6fb4b7bc0980}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory\Allocator">
+      <UniqueIdentifier>{04325de4-141a-4cc3-b427-a7fa6d980ee9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory\Allocator\Flat">
+      <UniqueIdentifier>{8d831686-9de9-4ade-9442-d8da4302d729}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory\Allocator\Paging">
+      <UniqueIdentifier>{cfab99b2-eaa7-4b5d-8187-eea1281a7558}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Process">
+      <UniqueIdentifier>{4a13f225-405a-40a9-947b-5cbf705806aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Process\Command">
+      <UniqueIdentifier>{27ec7ed5-42d8-48a0-b5b5-5d2c06d77005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Process\CPU">
+      <UniqueIdentifier>{08fbbf57-cdf6-4223-83ae-b1c4c88f307a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Process\Scheduler">
+      <UniqueIdentifier>{bc48f61f-4cb0-4853-ae33-ae63142f29b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Process\Command\PrintCommand">
+      <UniqueIdentifier>{f9031058-d267-4bec-af8e-98b74c8aecbe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Console.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConsoleManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CPU.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ICommand.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Config.h">
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
     <ClInclude Include="MainConsole.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Console\MainConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleManager.h">
+      <Filter>Header Files\Console\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="AConsole.h">
+      <Filter>Header Files\Console</Filter>
     </ClInclude>
     <ClInclude Include="MarqueeConsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Process.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Console\MarqueeConsole</Filter>
     </ClInclude>
     <ClInclude Include="ProcessConsole.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Console\ProcessConsole</Filter>
     </ClInclude>
-    <ClInclude Include="Scheduler.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="IAllocator.h">
+      <Filter>Header Files\Memory\Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="FlatAllocator.h">
+      <Filter>Header Files\Memory\Allocator\Flat</Filter>
+    </ClInclude>
+    <ClInclude Include="PagingAllocator.h">
+      <Filter>Header Files\Memory\Allocator\Paging</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryManager.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Process.h">
+      <Filter>Header Files\Process</Filter>
     </ClInclude>
     <ClInclude Include="PrintCommand.h">
-      <Filter>Header Files\Commands</Filter>
+      <Filter>Header Files\Process\Command\PrintCommand</Filter>
     </ClInclude>
-    <ClInclude Include="Config.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ICommand.h">
+      <Filter>Header Files\Process\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="CPU.h">
+      <Filter>Header Files\Process\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="Scheduler.h">
+      <Filter>Header Files\Process\Scheduler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PrintCommand.cpp">
-      <Filter>Header Files\Commands</Filter>
-    </ClCompile>
-    <ClCompile Include="Console.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ConsoleManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CPU.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Header Files\Config</Filter>
+    </ClCompile>
     <ClCompile Include="MainConsole.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Console\MainConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleManager.cpp">
+      <Filter>Header Files\Console\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="AConsole.cpp">
+      <Filter>Header Files\Console</Filter>
     </ClCompile>
     <ClCompile Include="MarqueeConsole.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Process.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Console\MarqueeConsole</Filter>
     </ClCompile>
     <ClCompile Include="ProcessConsole.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Console\ProcessConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="FlatAllocator.cpp">
+      <Filter>Header Files\Memory\Allocator\Flat</Filter>
+    </ClCompile>
+    <ClCompile Include="PagingAllocator.cpp">
+      <Filter>Header Files\Memory\Allocator\Paging</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryManager.cpp">
+      <Filter>Header Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Process.cpp">
+      <Filter>Header Files\Process</Filter>
+    </ClCompile>
+    <ClCompile Include="PrintCommand.cpp">
+      <Filter>Header Files\Process\Command\PrintCommand</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU.cpp">
+      <Filter>Header Files\Process\CPU</Filter>
     </ClCompile>
     <ClCompile Include="Scheduler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Config.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files\Process\Scheduler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

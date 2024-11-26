@@ -1,23 +1,26 @@
-#include "Console.h"
-#include "ConsoleManager.h"
-#include "MainConsole.h"
+
 #include <cstdlib>
+#include <fstream> // in use
 #include <iostream>
 #include <memory>
-#include <sstream>
+#include <sstream> // in use
 #include <string>
 #include <vector>
-#include <fstream>
-#include "Scheduler.h"
-#include "MarqueeConsole.h"
+
+#include "AConsole.h"
 #include "Config.h"
+#include "ConsoleManager.h"
+#include "Cpu.h"
+#include "MainConsole.h"
+#include "MarqueeConsole.h"
+#include "MemoryManager.h"
 #include "PrintCommand.h"
-#include <random>
+#include "Scheduler.h"
 
 #define SPACE " "
 
 
-MainConsole::MainConsole(ConsoleManager* conman) : Console("MAIN_CONSOLE"), _conman(conman) {
+MainConsole::MainConsole(ConsoleManager* conman) : AConsole("MAIN_CONSOLE"), _conman(conman) {
 	// SCREEN
 	this->_commandMap["screen"] = [conman](argType arguments) {
 		if (arguments.size() > 2) {
@@ -32,7 +35,7 @@ MainConsole::MainConsole(ConsoleManager* conman) : Console("MAIN_CONSOLE"), _con
 		if (arguments.at(0) == "-s") {
 			if (arguments.size() == 1)
 				std::cout << "No process specified." << std::endl;
-			else 
+			else
 				conman->newConsole(arguments.at(1));
 		}
 		else if (arguments.at(0) == "-r") {
@@ -66,6 +69,15 @@ MainConsole::MainConsole(ConsoleManager* conman) : Console("MAIN_CONSOLE"), _con
 	this->_commandMap["scheduler-stop"] = [conman](argType arguments) {
 		conman->_scheduler->schedulerTestStop();
 		};
+	this->_commandMap["memory"] = [conman](argType arguments) {
+		conman->_scheduler->printMem();
+		};
+	this->_commandMap["process-smi"] = [conman](argType arguments) {
+		conman->_scheduler->processSmi();
+		};
+	this->_commandMap["vmstat"] = [conman](argType arguments) {
+		conman->_scheduler->vmstat();
+		};
 }
 
 void MainConsole::run() {
@@ -77,25 +89,35 @@ void MainConsole::run() {
 			this->_initialized = true;
 			this->_conman->newConsole("MARQUEE_CONSOLE", std::make_shared<MarqueeConsole>(144));
 
-			Config schedConfig = Config();
-			schedConfig.initialize();
-			Scheduler::initialize(schedConfig.getNumCpu(), schedConfig.getBatchProcessFreq(), schedConfig.getMinIns(), schedConfig.getMaxIns());
+			Config config = Config();
+			config.initialize();
+
+			if (config.getMinPageProc() != 1 && config.getMaxPageProc() != 1) {
+				Process::setRequiredMemory(config.getMinMemProc(), config.getMaxMemProc());
+			}
+
+			Scheduler::initialize(config.getNumCpu(),
+				config.getBatchProcessFreq(),
+				config.getMinIns(), config.getMaxIns(),
+				config.getMinMemProc(), config.getMaxMemProc(),
+				config.getMaxMem(), config.getMinPageProc(), config.getMaxPageProc());
 
 			Scheduler* sched = Scheduler::get();
 
 			this->_conman->_scheduler = sched;
 
-			PrintCommand::setMsDelay(schedConfig.getDelaysPerExec() * 1000);
+			PrintCommand::setMsDelay(0);
+			CPU::setMsDelay(config.getDelaysPerExec() * 1000);
 
-			std::string schedType = schedConfig.getScheduler();
+			std::string schedType = config.getScheduler();
 			if (schedType == "fcfs") {
-				sched->startFCFS(schedConfig.getDelaysPerExec());
+				sched->startFCFS(config.getDelaysPerExec());
 			}
 			else if (schedType == "sjf") {
-				sched->startSJF(schedConfig.getDelaysPerExec(), schedConfig.isPreemptive());
+				sched->startSJF(config.getDelaysPerExec(), config.isPreemptive());
 			}
 			else if (schedType == "rr") {
-				sched->startRR(schedConfig.getDelaysPerExec(), schedConfig.getQuantumCycle());
+				sched->startRR(config.getDelaysPerExec(), config.getQuantumCycle());
 			}
 
 		}

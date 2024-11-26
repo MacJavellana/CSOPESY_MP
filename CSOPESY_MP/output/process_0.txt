@@ -1,8 +1,0 @@
-(11/04/24 01:12:34 AM) Core:1 "Hello world from process_0!"
-(11/04/24 01:12:36 AM) Core:1 "Hello world from process_0!"
-(11/04/24 01:12:38 AM) Core:1 "Hello world from process_0!"
-(11/04/24 01:12:41 AM) Core:2 "Hello world from process_0!"
-(11/04/24 01:12:42 AM) Core:3 "Hello world from process_0!"
-(11/04/24 01:12:44 AM) Core:3 "Hello world from process_0!"
-(11/04/24 01:12:49 AM) Core:0 "Hello world from process_0!"
-(11/04/24 01:12:52 AM) Core:1 "Hello world from process_0!"
