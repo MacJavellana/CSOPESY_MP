@@ -181,7 +181,7 @@ void Scheduler::schedulerRun() {
     while (this->_testRunning) {
         std::shared_ptr<Process> process = std::make_shared<Process>("process_" + std::to_string(Process::nextID), commandDistr, memDistr, pageDistr);
         this->addProcess(process);
-        std::this_thread::sleep_for(std::chrono::milliseconds(int(this->batchProcessFreq * 1000)));
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(this->batchProcessFreq * 100)));
     }
 
 }

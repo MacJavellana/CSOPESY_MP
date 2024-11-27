@@ -43,7 +43,17 @@ bool ConsoleManager::newConsole(std::string name, AConsole_ console) {
         }
         if (found)
             this->_consoleMap[name] = console;
+        /*else {
+            std::uniform_int_distribution<int> commandDistr(this->_scheduler->minIns, this->_scheduler->maxIns);
+            std::uniform_int_distribution<int> memDistr(this->_scheduler->_minMemProc, this->_scheduler->_maxMemProc);
+            std::uniform_int_distribution<int> pageDistr(this->_scheduler->_minPage, this->_scheduler->_maxPage);
 
+            auto newProcess = std::make_shared<Process>(name, commandDistr, memDistr, pageDistr);
+            this->_scheduler->addProcess(newProcess);
+            console = std::make_shared<ProcessConsole>(newProcess);
+            this->_consoleMap[name] = console;
+            found = true;
+        }*/
         this->switchConsole(name);
     }
     else {
