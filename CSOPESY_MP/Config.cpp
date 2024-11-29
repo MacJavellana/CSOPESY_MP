@@ -44,8 +44,8 @@ void Config::initialize() {
     int min_mem_proc = stoi(config["min-mem-per-proc"]);
     int max_mem_proc = stoi(config["max-mem-per-proc"]);
     float delay_per_exec = stof(config["delay-per-exec"]);
-    int min_page_proc = stoi(config["min-page-per-proc"]);
-    int max_page_proc = stoi(config["max-page-per-proc"]);
+    int min_page_proc = 2;
+    int max_page_proc = stoi(config["mem-per-frame"]);
 
 
     this->_numCpu = num_cpu;
